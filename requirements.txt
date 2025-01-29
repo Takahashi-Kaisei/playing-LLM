@@ -1,0 +1,43 @@
+# --- LangChainコアや必要な拡張のみ ---
+langchain
+# もし個別に使っているならば、以下のどれか
+langchain-community
+langchain-experimental
+langchain-text-splitters
+langchain-google-genai
+langchain-huggingface
+# langchain-openai
+
+# --- LLM関連 ---
+# transformers や torch, sentence-transformers を使う場合
+transformers
+torch
+sentence-transformers
+
+# --- HuggingFace Hub など使う場合 ---
+huggingface-hub
+
+# --- Google関連を使うならここで必要分だけを明示 ---
+google-api-python-client
+# google-generativeai など実際に使う方のみ指定
+google-generativeai
+
+# --- データ処理系 ---
+pandas
+numpy
+scikit-learn
+scipy
+nltk
+
+# --- その他必要に応じて ---
+requests  # 手動でrequestsを直接使う場合のみ
+# 以下のようなライブラリも、利用していれば残す:
+# beautifulsoup4
+# lxml
+# PyYAML
+python-dotenv
+# pypdf / pypdfium2
+# fsspec
+# filetype
+# etc.
+faiss-cpu
