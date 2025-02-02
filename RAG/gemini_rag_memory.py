@@ -32,7 +32,6 @@ class Gemini_RAG_Memory:
 
     def _text_splitter(
         self,
-        document_list,
         chunk_size: int = 100,
         chunk_overlap: int = 70
     ):
