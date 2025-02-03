@@ -55,6 +55,7 @@ class Gemini_RAG_Memory:
         self.qa_chain = None
         self.qa_with_history = None
 
+
     def _loader(self, path: str = "data/rag.txt"):
         """
         指定したファイルパスからドキュメントを読み込む
@@ -106,9 +107,19 @@ class Gemini_RAG_Memory:
         指定パスのファイルをロード→分割→ベクトルストアへ格納→リトリーバー作成 までを行う
         """
         self._loader(path)
-        self._text_splitter(self.documents, chunk_size, chunk_overlap)
+        self._text_splitter(chunk_size, chunk_overlap)
         self._vector_store()
         self._retriever(k)
+
+    def _trimmer(self):
+        self.trimmer = trim_messages(
+        max_tokens=5, # system message含め，5つのメッセージまで保持する．
+        strategy="last", # ここがlastだと最後のメッセージからtrimしてくれる
+        token_counter=len, #ここがlenだとメッセージ数でtrimしてくれる
+        include_system=True,
+        allow_partial=False,
+        start_on="human",
+        )
 
     def _preparation_prompt(self):
         """
@@ -156,7 +167,8 @@ class Gemini_RAG_Memory:
             ("human", "{input}"),
         ])
         self.qa_chain = (
-            qa_prompt
+            self.trimmer
+            | qa_prompt
             | llm
             | self._get_msg_content
         )
@@ -191,7 +203,7 @@ class Gemini_RAG_Memory:
         """
         RunnableWithMessageHistoryを生成し、qa_with_history属性へ格納する
         """
-        chat_history_for_chain = InMemoryChatMessageHistory()
+        self.chat_history_for_chain = InMemoryChatMessageHistory()
 
         @chain
         def wrapper_for_chain(input_: dict):
@@ -203,7 +215,7 @@ class Gemini_RAG_Memory:
 
         self.qa_with_history = RunnableWithMessageHistory(
             wrapper_for_chain,
-            lambda _: chat_history_for_chain,  # session_idによって分けたい場合にはここを変える
+            lambda _: self.chat_history_for_chain,  # session_idによって分けたい場合にはここを変える
             input_messages_key="input",
             history_messages_key="chat_history",
         )
@@ -212,6 +224,7 @@ class Gemini_RAG_Memory:
         """
         QA実行に最低限必要なチェーンなどの準備を行う
         """
+        self._trimmer()
         self._preparation_prompt()
         self._preparation_run()
 
