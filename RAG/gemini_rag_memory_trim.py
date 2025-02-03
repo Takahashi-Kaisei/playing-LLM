@@ -121,9 +121,12 @@ class Gemini_RAG_Trimmed_Memory:
         allow_partial=True,
         start_on="human",
         )
+
+        print("トリマーに入力されたメッセージ", type(input_messages))
         print("トリマーに入力されたメッセージ", input_messages)
         self.chat_history_for_chain.messages = trimmer.invoke(input_messages)
         print("トリマーによってトリミングされた後のメッセージ", self.chat_history_for_chain.messages)
+        print("トリマーによってトリミングされた後のメッセージ", type(self.chat_history_for_chain.messages))
 
     # def _print_trimmed(self, messages):
     #     print("Trimmed messages:")
